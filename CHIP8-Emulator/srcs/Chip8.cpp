@@ -1,13 +1,22 @@
 #include "Chip8.h"
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
 Chip8::Chip8()
-	: opcode(0), index(0), pc(START_ADDRESS), sp(0), delayTimer(0), soundTimer(0)
+	: opcode(0), index(0), pc(START_ADDRESS), sp(0), delayTimer(0), soundTimer(0), 
+        randGen(std::chrono::system_clock::now().time_since_epoch().count())
 {
+    // Load fonts into memory
+    for (unsigned int i = 0; i < FONTSET_SIZE; ++i)
+    {
+        memory[FONTSET_START_ADDRESS + i] = fontset[i];
+    }
 
+    // Initialize RNG
+    randByte = std::uniform_int_distribution<int>(0U, 255U);
 }
 
 bool Chip8::LoadROM(const std::string& filename)
