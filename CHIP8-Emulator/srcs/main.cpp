@@ -2,7 +2,7 @@
 
 int main()
 {
-	Window window("CHIP8-Emulator", 1920, 1080, 1920, 1080);
+	Window window("CHIP8-Emulator", 1280, 720, 64, 32);
 
 	bool running = true;
 	SDL_Event event;
