@@ -110,10 +110,10 @@ void Window::Update(const void* buffer, int pitch)
 
 	// Display the texture inside ImGui window
     {
-        ImGui::Begin("Render");
+        ImGui::Begin("Frame", nullptr, ImGuiWindowFlags_NoResize);
         
         ImVec2 available_size = ImGui::GetContentRegionAvail();
-        ImGui::Image((ImTextureID)(intptr_t)texture, available_size, ImVec2(0, 0), ImVec2(1, 1));
+        ImGui::Image((ImTextureID)(intptr_t)texture, ImVec2(512, 256), ImVec2(0, 0), ImVec2(1, 1));
 
         ImGui::End();
     }
