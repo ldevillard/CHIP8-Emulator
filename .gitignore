@@ -1,0 +1,19 @@
+#################
+## CHIP8-Emulator
+#################
+
+CHIP8-Emulator.sln
+CHIP8-Emulator.vcxproj
+CHIP8-Emulator.vcxproj.filters
+CHIP8-Emulator.vcxproj.user
+CMakeFiles/
+
+#################
+## Visual Studio
+#################
+
+.vs/
+/build/
+/bin/
+/Debug/
+/Release/
