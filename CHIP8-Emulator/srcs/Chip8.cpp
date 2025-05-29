@@ -139,6 +139,7 @@ void Chip8::Cycle()
 		--delayTimer;
 	}
 	
+	// TODO: Check if the sound is working
 	// Update sound timer
 	if (soundTimer)
 	{
@@ -370,7 +371,7 @@ void Chip8::OP_Cxnn()
 	uint8_t nn = opcode & 0x00FF;
 
 	// Generate a random byte and mask it with nn
-	registers[Vx] = randByte(randGen) & nn;
+	registers[Vx] = static_cast<uint8_t>(randByte(randGen)) & nn;
 }
 
 void Chip8::OP_Dxyn()
@@ -387,20 +388,24 @@ void Chip8::OP_Dxyn()
 
 	for (uint8_t row = 0; row < n; ++row)
 	{
-		uint8_t spriteRow = memory[index + row];
+		uint8_t spriteByte = memory[index + row];
+
 		for (uint8_t col = 0; col < 8; ++col)
 		{
-			if ((spriteRow & (0x80 >> col)) != 0)
+			uint8_t spritePixel = spriteByte & (0x80u >> col);
+			uint32_t* screenPixel = &video[(y + row) * VIDEO_WIDTH + (x + col)];
+
+			// Sprite pixel is on
+			if (spritePixel)
 			{
-				uint32_t pixelIndex = (y + row) * VIDEO_WIDTH + (x + col);
-				if (pixelIndex < VIDEO_HEIGHT * VIDEO_WIDTH)
+				// Screen pixel also on - collision
+				if (*screenPixel == 0xFFFFFFFF)
 				{
-					if (video[pixelIndex] == 1)
-					{
-						registers[0xF] = 1; // Collision detected
-					}
-					video[pixelIndex] ^= 1; // Toggle pixel
+					registers[0xF] = 1;
 				}
+
+				// Effectively XOR with the sprite pixel
+				*screenPixel ^= 0xFFFFFFFF;
 			}
 		}
 	}

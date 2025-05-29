@@ -14,6 +14,7 @@ public:
 	void Cycle();
 
 	uint8_t* GetKeypad() { return keypad; }
+	uint32_t* GetVideo() { return video; }
 
 private:
 #pragma region Opcode Tables

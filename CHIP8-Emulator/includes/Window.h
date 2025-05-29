@@ -12,7 +12,7 @@ public:
 	Window(const std::string& title, int width, int height, int textureWidth, int textureHeight);
 	~Window();
 
-	void Update(const void* buffer, int pitch);
+	void Update(const void* buffer);
 	bool ProcessInput(uint8_t* keys);
 
 private:

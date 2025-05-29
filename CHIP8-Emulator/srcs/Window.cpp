@@ -51,36 +51,7 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// Create a default checkerboard texture (this will be remove in the future)
-    std::vector<GLubyte> pixels(textureWidth * textureHeight * 4, 255);
-    {
-        for (int j = 0; j < textureHeight; ++j)
-        {
-            for (int i = 0; i < textureWidth; ++i)
-            {
-                bool grid = (i + j) % 2 == 0;
-
-                int index = (j * textureWidth + i) * 4;
-
-                if (grid) 
-                {
-                    pixels[index + 0] = 255; // R
-                    pixels[index + 1] = 255; // G
-                    pixels[index + 2] = 255; // B
-                    pixels[index + 3] = 255; // A
-                }
-                else 
-                {
-                    pixels[index + 0] = 0;   // R
-                    pixels[index + 1] = 0;   // G
-                    pixels[index + 2] = 0;   // B
-                    pixels[index + 3] = 255; // A
-                }
-            }
-        }
-    }
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -97,11 +68,16 @@ Window::~Window()
     SDL_Quit();
 }
 
-void Window::Update(const void* buffer, int pitch)
+void Window::Update(const void* buffer)
 {
     glViewport(0, 0, 1920, 1080);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // Update texture with new pixel data
+    // TODO: Register texture width and height in the constructor
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 64, 32, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
     // Start ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -115,7 +91,7 @@ void Window::Update(const void* buffer, int pitch)
         ImVec2 available_size = ImGui::GetContentRegionAvail();
 
         // TODO: Set constant ImGui window size
-        ImGui::Image((ImTextureID)(intptr_t)texture, ImVec2(512, 256), ImVec2(0, 0), ImVec2(1, 1));
+        ImGui::Image((ImTextureID)(intptr_t)texture, ImVec2(1024, 512), ImVec2(0, 0), ImVec2(1, 1));
 
         ImGui::End();
     }
@@ -152,10 +128,10 @@ bool Window::ProcessInput(uint8_t* keys)
                 keys[it->second] = (event.type == SDL_EVENT_KEY_DOWN) ? 1 : 0;
             }
         }
-    }
 
-	// Send events to ImGui
-    ImGui_ImplSDL3_ProcessEvent(&event);
+        // Send events to ImGui
+        ImGui_ImplSDL3_ProcessEvent(&event);
+    }
 
 	return running;
 }
