@@ -113,6 +113,8 @@ void Window::Update(const void* buffer, int pitch)
         ImGui::Begin("Frame", nullptr, ImGuiWindowFlags_NoResize);
         
         ImVec2 available_size = ImGui::GetContentRegionAvail();
+
+        // TODO: Set constant ImGui window size
         ImGui::Image((ImTextureID)(intptr_t)texture, ImVec2(512, 256), ImVec2(0, 0), ImVec2(1, 1));
 
         ImGui::End();
