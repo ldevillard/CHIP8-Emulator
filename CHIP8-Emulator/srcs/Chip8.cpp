@@ -122,6 +122,30 @@ bool Chip8::LoadROM(const std::string& filename)
 	return true;
 }
 
+void Chip8::Cycle()
+{
+	// Fetch the next opcode
+	opcode = (memory[pc] << 8) | memory[pc + 1];
+
+	// Increment the program counter
+	pc += 2;
+
+	// Decode and execute the opcode
+	((*this).*(table[(opcode & 0xF000) >> 12]))();
+
+	// Update timers
+	if (delayTimer > 0)
+	{
+		--delayTimer;
+	}
+	
+	// Update sound timer
+	if (soundTimer)
+	{
+		--soundTimer;
+	}
+}
+
 #pragma region Opcode Tables
 void Chip8::Table0()
 {

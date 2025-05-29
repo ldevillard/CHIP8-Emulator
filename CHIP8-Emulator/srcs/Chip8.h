@@ -11,6 +11,7 @@ public:
 	Chip8();
 
 	bool LoadROM(const std::string& filename);
+	void Cycle();
 
 private:
 #pragma region Opcode Tables
