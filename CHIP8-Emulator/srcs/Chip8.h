@@ -13,7 +13,17 @@ public:
 	bool LoadROM(const std::string& filename);
 
 private:
+#pragma region Opcode Tables
+	void Table0();
+	void Table8();
+	void TableE();
+	void TableF();
+#pragma endregion
+
 #pragma region Operation Codes
+	// Do nothing, used for unimplemented or reserved opcodes
+	void OP_NULL();
+
 	// Clear the display
 	void OP_00E0();
 	// Return from a subroutine
@@ -138,4 +148,13 @@ private:
 	std::default_random_engine randGen;
 	// uniform_int_distribution does not support uint8_t, so we use int (we'll need static_cast<uint8_t> when using it)
 	std::uniform_int_distribution<int> randByte;
+
+	// Opcode tables
+	using Chip8Func = void (Chip8::*)();
+
+	Chip8Func table[0xF + 1];
+	Chip8Func table0[0xE + 1];
+	Chip8Func table8[0xE + 1];
+	Chip8Func tableE[0xE + 1];
+	Chip8Func tableF[0x65 + 1];
 };

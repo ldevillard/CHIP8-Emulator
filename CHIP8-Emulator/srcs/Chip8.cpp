@@ -17,6 +17,70 @@ Chip8::Chip8()
 
     // Initialize RNG
     randByte = std::uniform_int_distribution<int>(0U, 255U);
+
+	// Initialize opcode table
+	table[0x0] = &Chip8::Table0;
+	table[0x1] = &Chip8::OP_1nnn;
+	table[0x2] = &Chip8::OP_2nnn;
+	table[0x3] = &Chip8::OP_3xnn;
+	table[0x4] = &Chip8::OP_4xnn;
+	table[0x5] = &Chip8::OP_5xy0;
+	table[0x6] = &Chip8::OP_6xnn;
+	table[0x7] = &Chip8::OP_7xnn;
+	// 0x8xy0 to 0x8xyE
+	table[0x8] = &Chip8::Table8; 
+	table[0x9] = &Chip8::OP_9xy0;
+	table[0xA] = &Chip8::OP_Annn;
+	table[0xB] = &Chip8::OP_Bnnn;
+	table[0xC] = &Chip8::OP_Cxnn;
+	table[0xD] = &Chip8::OP_Dxyn;
+	// 0Ex9E and 0ExA1
+	table[0xE] = &Chip8::TableE; 
+	// 0Fx07 to 0Fx65
+	table[0xF] = &Chip8::TableF; 
+
+	// Initialize Table0, Table8, TableE with OP_NULL
+	for (int i = 0; i <= 0xE; ++i) 
+	{
+		table0[i] = &Chip8::OP_NULL;
+		table8[i] = &Chip8::OP_NULL;
+		tableE[i] = &Chip8::OP_NULL;
+	}
+
+	// Initialize Table0
+	table0[0x0] = &Chip8::OP_00E0;
+	table0[0xE] = &Chip8::OP_00EE;
+
+	// Initialize Table8
+	table8[0x0] = &Chip8::OP_8xy0;
+	table8[0x1] = &Chip8::OP_8xy1;
+	table8[0x2] = &Chip8::OP_8xy2;
+	table8[0x3] = &Chip8::OP_8xy3;
+	table8[0x4] = &Chip8::OP_8xy4;
+	table8[0x5] = &Chip8::OP_8xy5;
+	table8[0x6] = &Chip8::OP_8xy6;
+	table8[0x7] = &Chip8::OP_8xy7;
+	table8[0xE] = &Chip8::OP_8xyE;
+
+	// Initialize TableE
+	tableE[0x1] = &Chip8::OP_ExA1;
+	tableE[0xE] = &Chip8::OP_Ex9E;
+
+	// Initialize TableF
+	for (int i = 0; i <= 0x65; ++i)
+	{
+		tableF[i] = &Chip8::OP_NULL;
+	}
+
+	tableF[0x07] = &Chip8::OP_Fx07;
+	tableF[0x0A] = &Chip8::OP_Fx0A;
+	tableF[0x15] = &Chip8::OP_Fx15;
+	tableF[0x18] = &Chip8::OP_Fx18;
+	tableF[0x1E] = &Chip8::OP_Fx1E;
+	tableF[0x29] = &Chip8::OP_Fx29;
+	tableF[0x33] = &Chip8::OP_Fx33;
+	tableF[0x55] = &Chip8::OP_Fx55;
+	tableF[0x65] = &Chip8::OP_Fx65;
 }
 
 bool Chip8::LoadROM(const std::string& filename)
@@ -58,7 +122,35 @@ bool Chip8::LoadROM(const std::string& filename)
 	return true;
 }
 
+#pragma region Opcode Tables
+void Chip8::Table0()
+{
+	((*this).*(table0[opcode & 0x000F]))();
+}
+
+void Chip8::Table8()
+{
+	((*this).*(table8[opcode & 0x000F]))();
+}
+
+void Chip8::TableE()
+{
+	((*this).*(tableE[opcode & 0x000F]))();
+}
+
+void Chip8::TableF()
+{
+	((*this).*(tableF[opcode & 0x00FF]))();
+}
+#pragma endregion
+
 #pragma region Operation Codes
+void Chip8::OP_NULL()
+{
+	// This is a no-operation code, typically used for debugging or as a placeholder.
+	// It does nothing and simply returns control to the main loop.
+}
+
 void Chip8::OP_00E0()
 {
 	memset(video, 0, sizeof(video));
