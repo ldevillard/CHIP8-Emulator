@@ -38,6 +38,7 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     // Setup ImGui style
     ImGui::StyleColorsDark();
@@ -78,7 +79,6 @@ void Window::Update(const void* buffer)
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Update texture with new pixel data
-    // TODO: Register texture width and height in the constructor
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, textureWidth, textureHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
@@ -87,13 +87,42 @@ void Window::Update(const void* buffer)
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
+    // Detup docking space
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImVec2 pos(viewport->Pos.x, viewport->Pos.y);
+    ImVec2 size(viewport->Size.x, viewport->Size.y);
+    ImGui::SetNextWindowPos(pos);
+    ImGui::SetNextWindowSize(size);
+    ImGui::Begin("DockSpace", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
+    ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+    ImGui::DockSpace(dockspace_id);
+    ImGui::End();
+
 	// Display the texture inside ImGui window
     {
-        ImGui::Begin("Frame", nullptr);
+        ImGui::Begin("CHIP8-Emulator", nullptr, ImGuiWindowFlags_NoResize);
         
         ImVec2 available_size = ImGui::GetContentRegionAvail();
         ImGui::Image((ImTextureID)(intptr_t)texture, available_size, ImVec2(0, 0), ImVec2(1, 1));
 
+        ImGui::End();
+    }
+
+    // Footer
+    {
+		ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize);
+		ImGui::Text("Press ESC to exit");
+		ImGui::End();
+    }
+
+    // Debug Menu
+    {
+        ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_NoResize);
+        ImGui::Text("TODO: Display registers and memory");
         ImGui::End();
     }
 

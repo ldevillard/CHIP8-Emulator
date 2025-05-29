@@ -14,8 +14,8 @@ int main()
 	}
 
 	std::chrono::steady_clock::time_point lastCycleTime = std::chrono::high_resolution_clock::now();
-	bool running = true;
 	
+	bool running = true;
 	while (running) 
 	{
 		running = window->ProcessInput(chip8->GetKeypad());

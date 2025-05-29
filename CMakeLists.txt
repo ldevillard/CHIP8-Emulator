@@ -23,8 +23,8 @@ FetchContent_MakeAvailable(SDL3)
 # ImGui
 FetchContent_Declare(
   imgui
-  GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG v1.91.8
+  GIT_REPOSITORY https://github.com/ocornut/imgui
+  GIT_TAG docking
 )
 FetchContent_MakeAvailable(imgui)
 
