@@ -127,10 +127,35 @@ void Window::Update(const void* buffer, int pitch)
     SDL_GL_SwapWindow(window);
 }
 
-bool Window::ProcessInput(SDL_Event* event, uint8_t* keys)
+bool Window::ProcessInput(uint8_t* keys)
 {
-    ImGui_ImplSDL3_ProcessEvent(event);
+    bool running = true;
 
-	// TODO: Handle all CHIP-8 input events here
-	return true;
+	SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        // Send and handle CHIP-8 input events
+        if (event.type == SDL_EVENT_QUIT)
+        {
+            running = false;
+        }
+        else if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
+        {
+            if (event.key.key == SDLK_ESCAPE)
+            {
+                running = false;
+            }
+
+            auto it = keymap.find(event.key.key);
+            if (it != keymap.end())
+            {
+                keys[it->second] = (event.type == SDL_EVENT_KEY_DOWN) ? 1 : 0;
+            }
+        }
+    }
+
+	// Send events to ImGui
+    ImGui_ImplSDL3_ProcessEvent(&event);
+
+	return running;
 }

@@ -13,6 +13,8 @@ public:
 	bool LoadROM(const std::string& filename);
 	void Cycle();
 
+	uint8_t* GetKeypad() { return keypad; }
+
 private:
 #pragma region Opcode Tables
 	void Table0();

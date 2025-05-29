@@ -12,19 +12,9 @@ int main()
 	}
 
 	bool running = true;
-	SDL_Event event;
 	while (running) 
 	{
-		while (SDL_PollEvent(&event)) 
-		{
-			// Send and handle CHIP-8 input events
-			running = window.ProcessInput(&event, nullptr);
-		
-			if (event.type == SDL_EVENT_QUIT) 
-			{
-				running = false;
-			}
-		}
+		running = window.ProcessInput(chip8.GetKeypad());
 		
 		// Rendering
 		window.Update(nullptr, 0);
