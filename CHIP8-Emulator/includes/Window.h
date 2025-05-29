@@ -20,6 +20,8 @@ private:
 	SDL_GLContext glContext;
 
 	GLuint texture;
+	int textureWidth;
+    int textureHeight;
 
     const std::unordered_map<SDL_Keycode, uint8_t> keymap = 
     {

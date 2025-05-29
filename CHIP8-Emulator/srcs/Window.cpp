@@ -9,6 +9,9 @@
 Window::Window(const std::string& title, int width, int height, int textureWidth, int textureHeight)
 	: window(nullptr), glContext(nullptr), texture(0)
 {
+	this->textureWidth = textureWidth;
+	this->textureHeight = textureHeight;
+
     SDL_Init(SDL_INIT_VIDEO);
 
     // Setup OpenGL context attributes
@@ -77,7 +80,7 @@ void Window::Update(const void* buffer)
     // Update texture with new pixel data
     // TODO: Register texture width and height in the constructor
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 64, 32, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, textureWidth, textureHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
     // Start ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -86,12 +89,10 @@ void Window::Update(const void* buffer)
 
 	// Display the texture inside ImGui window
     {
-        ImGui::Begin("Frame", nullptr, ImGuiWindowFlags_NoResize);
+        ImGui::Begin("Frame", nullptr);
         
         ImVec2 available_size = ImGui::GetContentRegionAvail();
-
-        // TODO: Set constant ImGui window size
-        ImGui::Image((ImTextureID)(intptr_t)texture, ImVec2(1024, 512), ImVec2(0, 0), ImVec2(1, 1));
+        ImGui::Image((ImTextureID)(intptr_t)texture, available_size, ImVec2(0, 0), ImVec2(1, 1));
 
         ImGui::End();
     }
