@@ -6,6 +6,11 @@
 #include <SDL3/SDL.h>
 #include <utils/glad.h>
 
+struct EmulatorConfig
+{
+    int emulationCycles = 1;
+};
+
 class Window 
 {
 public:
@@ -14,6 +19,8 @@ public:
 
 	void Update(const void* buffer);
 	bool ProcessInput(uint8_t* keys);
+
+	EmulatorConfig config;
 
 private:
 	SDL_Window* window;

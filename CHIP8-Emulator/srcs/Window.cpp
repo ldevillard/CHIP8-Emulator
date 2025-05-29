@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
+#include <utils/ImGui_Utils.h>
 #include <vector>
 
 Window::Window(const std::string& title, int width, int height, int textureWidth, int textureHeight)
@@ -41,7 +42,7 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     // Setup ImGui style
-    ImGui::StyleColorsDark();
+	ImGui_Utils::SetPurpleTheme();
 
     // Init SDL + OpenGL3 backends
     ImGui_ImplSDL3_InitForOpenGL(window, glContext);
@@ -87,7 +88,7 @@ void Window::Update(const void* buffer)
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    // Detup docking space
+    // Setup docking space
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 pos(viewport->Pos.x, viewport->Pos.y);
     ImVec2 size(viewport->Size.x, viewport->Size.y);
@@ -115,6 +116,7 @@ void Window::Update(const void* buffer)
     // Footer
     {
 		ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize);
+        ImGui::SetWindowFontScale(2.0f);
 		ImGui::Text("Press ESC to exit");
 		ImGui::End();
     }
@@ -122,7 +124,8 @@ void Window::Update(const void* buffer)
     // Debug Menu
     {
         ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_NoResize);
-        ImGui::Text("TODO: Display registers and memory");
+        ImGui::SetWindowFontScale(2.0f);
+		ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 1, 150);
         ImGui::End();
     }
 

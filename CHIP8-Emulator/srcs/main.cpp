@@ -28,8 +28,11 @@ int main()
 		{
 			lastCycleTime = currentTime;
 
-			// Execute a single CHIP-8 cycle
-			chip8->Cycle();
+			// Execute CHIP-8 cycles
+			for (int i = 0; i < window->config.emulationCycles; ++i) 
+			{
+				chip8->Cycle();
+			}
 
 			// Rendering
 			window->Update(chip8->GetVideo());
