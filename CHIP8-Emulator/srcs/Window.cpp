@@ -1,11 +1,13 @@
 #include "Window.h"
 
+#include <filesystem>
 #include <iostream>
+#include <vector>
+
 #include <imgui.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <utils/ImGui_Utils.h>
-#include <vector>
 
 Window::Window(const std::string& title, int width, int height, int textureWidth, int textureHeight)
 	: window(nullptr), glContext(nullptr), texture(0)
@@ -58,6 +60,19 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+	// Load ROMs from the specified folder
+	for (const auto& entry : std::filesystem::directory_iterator(ROMSFolder))
+	{
+		if (entry.is_regular_file() && entry.path().extension() == ".ch8")
+		{
+			ROMS.push_back(entry.path().string());
+		}
+	}
+	if (ROMS.empty())
+	{
+		std::cerr << "No ROMs found in " << ROMSFolder << std::endl;
+	}
 }
 
 Window::~Window()
@@ -167,4 +182,16 @@ bool Window::ProcessInput(uint8_t* keys)
     }
 
 	return running;
+}
+
+const std::string& Window::GetFirstFoundROM() const
+{
+    if (ROMS.empty()) 
+    {
+        return "";
+	}
+	else
+	{
+		return ROMS.front();
+    }
 }

@@ -8,7 +8,7 @@
 
 struct EmulatorConfig
 {
-    int emulationCycles = 1;
+    int emulationCycles = 5;
 };
 
 class Window 
@@ -20,6 +20,8 @@ public:
 	void Update(const void* buffer);
 	bool ProcessInput(uint8_t* keys);
 
+    const std::string& GetFirstFoundROM() const;
+
 	EmulatorConfig config;
 
 private:
@@ -29,6 +31,9 @@ private:
 	GLuint texture;
 	int textureWidth;
     int textureHeight;
+
+    static constexpr const char* ROMSFolder = "roms/";
+    std::vector<std::string> ROMS;
 
     const std::unordered_map<SDL_Keycode, uint8_t> keymap = 
     {
