@@ -33,6 +33,7 @@ private:
     int textureHeight;
 
     static constexpr const char* ROMSFolder = "roms/";
+	static const std::string INVALID_ROM;
     std::vector<std::string> ROMS;
     int currentROMIndex = 0;
 

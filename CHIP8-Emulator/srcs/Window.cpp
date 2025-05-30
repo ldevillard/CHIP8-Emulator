@@ -9,6 +9,8 @@
 #include <backends/imgui_impl_sdl3.h>
 #include <utils/ImGui_Utils.h>
 
+const std::string Window::INVALID_ROM = "Invalid ROM";
+
 Window::Window(const std::string& title, int width, int height, int textureWidth, int textureHeight)
 	: window(nullptr), glContext(nullptr), texture(0)
 {
@@ -198,7 +200,7 @@ const std::string& Window::GetFirstFoundROM() const
 {
     if (ROMS.empty()) 
     {
-        return "";
+        return INVALID_ROM;
 	}
 	else
 	{
