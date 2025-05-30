@@ -63,7 +63,15 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	// Load ROMs from the specified folder
+	// TODO: Maybe move this to a separate method
+	// Check if the ROMs folder exists and is a directory
+	if (!std::filesystem::exists(ROMSFolder) || !std::filesystem::is_directory(ROMSFolder))
+	{
+		std::cerr << "ROMs folder does not exist: " << ROMSFolder << std::endl;
+        exit(1);
+	}
+
+	// Populate the ROMS vector with .ch8 files
 	for (const auto& entry : std::filesystem::directory_iterator(ROMSFolder))
 	{
 		if (entry.is_regular_file() && entry.path().extension() == ".ch8")
@@ -71,9 +79,12 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
 			ROMS.push_back(entry.path().string().c_str());
 		}
 	}
+
+	// If no ROMs were found, print a message
 	if (ROMS.empty())
 	{
 		std::cerr << "No ROMs found in " << ROMSFolder << std::endl;
+        exit(1);
 	}
 }
 
