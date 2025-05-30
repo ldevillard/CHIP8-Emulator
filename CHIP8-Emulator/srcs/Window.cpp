@@ -66,7 +66,7 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
 	{
 		if (entry.is_regular_file() && entry.path().extension() == ".ch8")
 		{
-			ROMS.push_back(entry.path().string());
+			ROMS.push_back(entry.path().string().c_str());
 		}
 	}
 	if (ROMS.empty())
@@ -88,6 +88,7 @@ Window::~Window()
     SDL_Quit();
 }
 
+// TODO: Split interfaces in different methods
 void Window::Update(const void* buffer)
 {
     glViewport(0, 0, 1920, 1080);
@@ -139,8 +140,17 @@ void Window::Update(const void* buffer)
     // Debug Menu
     {
         ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_NoResize);
+
         ImGui::SetWindowFontScale(2.0f);
 		ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 1, 150);
+		ImGui::NewLine();
+
+        std::vector<const char*> cROMS;
+        cROMS.reserve(ROMS.size());
+        std::transform(ROMS.begin(), ROMS.end(), std::back_inserter(cROMS),
+            [](const std::string& s) { return s.c_str(); });
+        ImGui_Utils::DrawComboBoxControl("Loaded ROM", currentROMIndex, cROMS, 175);
+
         ImGui::End();
     }
 

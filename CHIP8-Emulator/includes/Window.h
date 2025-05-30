@@ -34,6 +34,7 @@ private:
 
     static constexpr const char* ROMSFolder = "roms/";
     std::vector<std::string> ROMS;
+    int currentROMIndex = 0;
 
     const std::unordered_map<SDL_Keycode, uint8_t> keymap = 
     {
