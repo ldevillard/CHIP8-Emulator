@@ -18,6 +18,15 @@ int main()
 	bool running = true;
 	while (running) 
 	{
+		if (window->HasChangedROM())
+		{
+			window->UpdateCurrentROMIndex();
+			if (!chip8->LoadROM(window->GetCurrentROMToLoad()))
+			{
+				return -1;
+			}
+		}
+
 		running = window->ProcessInput(chip8->GetKeypad());
 		
 		std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();

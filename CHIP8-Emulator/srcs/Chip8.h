@@ -17,6 +17,8 @@ public:
 	uint32_t* GetVideo() { return video; }
 
 private:
+	void ResetHardware();
+
 #pragma region Opcode Tables
 	void Table0();
 	void Table8();

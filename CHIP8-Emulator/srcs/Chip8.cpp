@@ -85,6 +85,8 @@ Chip8::Chip8()
 
 bool Chip8::LoadROM(const std::string& filename)
 {
+	ResetHardware();
+
     std::ifstream file(filename, std::ios::binary | std::ios::ate);
     if (file)
     {
@@ -145,6 +147,37 @@ void Chip8::Cycle()
 	{
 		--soundTimer;
 	}
+}
+
+void Chip8::ResetHardware()
+{
+	// Reset registers
+	memset(registers, 0, sizeof(registers));
+
+	// Reset memory and reload fonts
+	memset(memory, 0, sizeof(memory));
+	for (unsigned int i = 0; i < FONTSET_SIZE; ++i)
+	{
+		memory[FONTSET_START_ADDRESS + i] = fontset[i];
+	}
+
+	// Reset index register and program counter
+	index = 0;
+	pc = START_ADDRESS;
+	// Reset stack pointer and stack
+	sp = 0;
+	memset(stack, 0, sizeof(stack));
+	// Reset timers
+	delayTimer = 0;
+	soundTimer = 0;
+	// Clear video memory
+	memset(video, 0, sizeof(video));
+
+	// Clear keypad state
+	memset(keypad, 0, sizeof(keypad));
+
+	// Reinitialize RNG
+	randByte = std::uniform_int_distribution<int>(0U, 255U);
 }
 
 #pragma region Opcode Tables

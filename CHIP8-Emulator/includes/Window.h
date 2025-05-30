@@ -20,7 +20,11 @@ public:
 	void Update(const void* buffer);
 	bool ProcessInput(uint8_t* keys);
 
+	bool HasChangedROM() const { return currentROMIndex != ROMIndexRequested; }
+	void UpdateCurrentROMIndex() { currentROMIndex = ROMIndexRequested; }
+
     const std::string& GetFirstFoundROM() const;
+	const std::string& GetCurrentROMToLoad() const { return ROMS[currentROMIndex]; }
 
 	EmulatorConfig config;
 
@@ -36,6 +40,7 @@ private:
 	static const std::string INVALID_ROM;
     std::vector<std::string> ROMS;
     int currentROMIndex = 0;
+	int ROMIndexRequested = 0;
 
     const std::unordered_map<SDL_Keycode, uint8_t> keymap = 
     {

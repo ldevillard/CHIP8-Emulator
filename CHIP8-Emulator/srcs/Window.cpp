@@ -144,14 +144,14 @@ void Window::Update(const void* buffer)
         ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_NoResize);
 
         ImGui::SetWindowFontScale(2.0f);
-		ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 1, 150);
+		ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 5, 150);
 		ImGui::NewLine();
 
         std::vector<const char*> cROMS;
         cROMS.reserve(ROMS.size());
         std::transform(ROMS.begin(), ROMS.end(), std::back_inserter(cROMS),
             [](const std::string& s) { return s.c_str(); });
-        ImGui_Utils::DrawComboBoxControl("Loaded ROM", currentROMIndex, cROMS, 175);
+        ImGui_Utils::DrawComboBoxControl("Loaded ROM", ROMIndexRequested, cROMS, 175);
 
         ImGui::End();
     }
