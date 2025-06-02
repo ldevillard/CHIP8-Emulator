@@ -4,6 +4,8 @@
 
 Writing a simple CHIP8-Emulator to discover and learn the world of emulation.
 
+![Demo](https://github.com/ldevillard/CHIP8-Emulator/blob/master/demo.gif)
+
 ## Features 🔥
 
 - **Emulator**: Run any rom of the CHIP8 system.👾
