@@ -46,6 +46,7 @@ int main()
 			}
 
 			// Rendering
+			window->SetRegistersToDisplay(chip8->GetRegisters());
 			window->Update(chip8->GetVideo());
 
 			// Audio

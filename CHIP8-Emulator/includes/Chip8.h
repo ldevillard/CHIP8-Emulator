@@ -16,6 +16,22 @@ public:
 	uint8_t* GetKeypad() { return keypad; }
 	uint32_t* GetVideo() { return video; }
 	uint8_t GetSoundTimer() const { return soundTimer; }
+	uint8_t* GetRegisters() { return registers; }
+
+public:
+#pragma region Static Variables
+	static constexpr unsigned int START_ADDRESS = 0x200;
+
+	static constexpr unsigned int FONTSET_SIZE = 80;
+	static constexpr unsigned int FONTSET_START_ADDRESS = 0x50;
+
+	static constexpr unsigned int KEY_COUNT = 16;
+	static constexpr unsigned int MEMORY_SIZE = 4096;
+	static constexpr unsigned int REGISTER_COUNT = 16;
+	static constexpr unsigned int STACK_LEVELS = 16;
+	static constexpr unsigned int VIDEO_HEIGHT = 32;
+	static constexpr unsigned int VIDEO_WIDTH = 64;
+#pragma endregion
 
 private:
 	void ResetHardware();
@@ -102,21 +118,6 @@ private:
 #pragma endregion
 
 private:
-
-#pragma region Static Variables
-	static constexpr unsigned int START_ADDRESS = 0x200;
-
-	static constexpr unsigned int FONTSET_SIZE = 80;
-	static constexpr unsigned int FONTSET_START_ADDRESS = 0x50;
-
-	static constexpr unsigned int KEY_COUNT = 16;
-	static constexpr unsigned int MEMORY_SIZE = 4096;
-	static constexpr unsigned int REGISTER_COUNT = 16;
-	static constexpr unsigned int STACK_LEVELS = 16;
-	static constexpr unsigned int VIDEO_HEIGHT = 32;
-	static constexpr unsigned int VIDEO_WIDTH = 64;
-#pragma endregion
-
 	uint8_t fontset[FONTSET_SIZE] =
 	{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0

@@ -27,6 +27,8 @@ public:
 
     const std::string& GetFirstFoundROM() const;
     const std::string& GetCurrentROMToLoad() const { return ROMS[currentROMIndex]; }
+    
+	void SetRegistersToDisplay(uint8_t* registers) { registersToDisplay = registers; }
 
     EmulatorConfig config;
 
@@ -36,6 +38,7 @@ private:
     // Editor
     void SetupDockingSpace();
 	void DisplayEditor();
+    void DisplayRegisters();
 
 private:
     // Window display
@@ -60,6 +63,9 @@ private:
     std::vector<std::string> ROMS;
     int currentROMIndex = 0;
     int ROMIndexRequested = 0;
+
+    // Display data pointers
+	uint8_t* registersToDisplay = nullptr;
 
     const std::unordered_map<SDL_Keycode, uint8_t> keymap =
     {

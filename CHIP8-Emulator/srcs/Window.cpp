@@ -9,6 +9,8 @@
 #include <backends/imgui_impl_sdl3.h>
 #include <utils/ImGui_Utils.h>
 
+#include "Chip8.h"
+
 const std::string Window::INVALID_ROM = "Invalid ROM";
 
 Window::Window(const std::string& title, int width, int height, int textureWidth, int textureHeight)
@@ -205,8 +207,38 @@ void Window::DisplayEditor()
 			currentROMIndex = -1; 
         }
 
+		DisplayRegisters();
+
         ImGui::End();
     }
+}
+
+void Window::DisplayRegisters()
+{
+	if (registersToDisplay)
+	{
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::Separator();
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 125.0f);
+		ImGui::Text("Register");
+		ImGui::NextColumn();
+		ImGui::Text("Value");
+		ImGui::Separator();
+		ImGui::NextColumn();
+
+		for (int i = 0; i < Chip8::REGISTER_COUNT; ++i)
+		{
+			ImGui::Text("V%X", i);
+			ImGui::NextColumn();
+			ImGui::Text("0x%02x", registersToDisplay[i]);
+			ImGui::NextColumn();
+		}
+
+		ImGui::Columns(1);
+	}
 }
 
 bool Window::ProcessInput(uint8_t* keys)
