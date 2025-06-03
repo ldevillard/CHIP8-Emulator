@@ -198,6 +198,13 @@ void Window::DisplayEditor()
             [](const std::string& s) { return s.c_str(); });
         ImGui_Utils::DrawComboBoxControl("Loaded ROM", ROMIndexRequested, cROMS, 125);
 
+        if (ImGui_Utils::DrawButtonControl("Reset ROM", "RESET", 125)) 
+        {
+			ROMIndexRequested = currentROMIndex;
+			// HACK to force the ROM to reload
+			currentROMIndex = -1; 
+        }
+
         ImGui::End();
     }
 }
