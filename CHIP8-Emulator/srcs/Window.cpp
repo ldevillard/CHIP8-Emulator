@@ -139,7 +139,19 @@ void Window::Update(const void* buffer)
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    // Setup docking space
+	SetupDockingSpace();
+
+	DisplayEditor();
+
+    // Render ImGui
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    SDL_GL_SwapWindow(window);
+}
+
+void Window::SetupDockingSpace()
+{
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 pos(viewport->Pos.x, viewport->Pos.y);
     ImVec2 size(viewport->Size.x, viewport->Size.y);
@@ -153,7 +165,10 @@ void Window::Update(const void* buffer)
     ImGuiID dockspace_id = ImGui::GetID("DockSpace");
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
+}
 
+void Window::DisplayEditor() 
+{
     // Display the texture inside ImGui window
     {
         ImGui::Begin("CHIP8-Emulator", nullptr, ImGuiWindowFlags_NoResize);
@@ -167,7 +182,6 @@ void Window::Update(const void* buffer)
     // Footer
     {
         ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize);
-        ImGui::SetWindowFontScale(2.0f);
         ImGui::Text("Press ESC to exit");
         ImGui::End();
     }
@@ -176,24 +190,16 @@ void Window::Update(const void* buffer)
     {
         ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_NoResize);
 
-        ImGui::SetWindowFontScale(2.0f);
-        ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 5, 150);
-        ImGui::NewLine();
+        ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 5, 125);
 
         std::vector<const char*> cROMS;
         cROMS.reserve(ROMS.size());
         std::transform(ROMS.begin(), ROMS.end(), std::back_inserter(cROMS),
             [](const std::string& s) { return s.c_str(); });
-        ImGui_Utils::DrawComboBoxControl("Loaded ROM", ROMIndexRequested, cROMS, 175);
+        ImGui_Utils::DrawComboBoxControl("Loaded ROM", ROMIndexRequested, cROMS, 125);
 
         ImGui::End();
     }
-
-    // Render ImGui
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    SDL_GL_SwapWindow(window);
 }
 
 bool Window::ProcessInput(uint8_t* keys)

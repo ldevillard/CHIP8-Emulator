@@ -33,6 +33,10 @@ public:
 private:
     void InitAudio();
 
+    // Editor
+    void SetupDockingSpace();
+	void DisplayEditor();
+
 private:
     // Window display
     SDL_Window* window;

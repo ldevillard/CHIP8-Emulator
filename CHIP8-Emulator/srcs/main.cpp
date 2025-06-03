@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::unique_ptr<Window> window = std::make_unique<Window>("CHIP8-Emulator", 1920, 1080, 64, 32);
+	std::unique_ptr<Window> window = std::make_unique<Window>("CHIP8-Emulator", 1280, 720, 64, 32);
 
 	std::unique_ptr<Chip8> chip8 = std::make_unique<Chip8>();
 	if (!chip8->LoadROM(window->GetFirstFoundROM()))
