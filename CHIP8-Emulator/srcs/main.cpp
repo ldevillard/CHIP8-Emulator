@@ -14,9 +14,9 @@ int main()
 	}
 
 	std::chrono::steady_clock::time_point lastCycleTime = std::chrono::high_resolution_clock::now();
-	
+
 	bool running = true;
-	while (running) 
+	while (running)
 	{
 		if (window->HasChangedROM())
 		{
@@ -28,9 +28,10 @@ int main()
 		}
 
 		running = window->ProcessInput(chip8->GetKeypad());
-		
+
 		std::chrono::steady_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
 		float deltaTime = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
+		bool playSound = false;
 
 		// Limit the cycle time to approximately 60Hz (16.67ms per cycle)
 		if (deltaTime > 16.67f)
@@ -38,13 +39,20 @@ int main()
 			lastCycleTime = currentTime;
 
 			// Execute CHIP-8 cycles
-			for (int i = 0; i < window->config.emulationCycles; ++i) 
+			for (int i = 0; i < window->config.emulationCycles; ++i)
 			{
 				chip8->Cycle();
+				playSound = playSound ? true : chip8->GetSoundTimer() > 0;
 			}
 
 			// Rendering
 			window->Update(chip8->GetVideo());
+
+			// Audio
+			if (playSound)
+			{
+				window->PlaySound();
+			}
 		}
 	}
 }

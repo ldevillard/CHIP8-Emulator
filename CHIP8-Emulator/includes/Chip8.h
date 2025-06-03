@@ -4,7 +4,7 @@
 #include <string>
 #include <random>
 
-class Chip8 
+class Chip8
 {
 
 public:
@@ -15,6 +15,7 @@ public:
 
 	uint8_t* GetKeypad() { return keypad; }
 	uint32_t* GetVideo() { return video; }
+	uint8_t GetSoundTimer() const { return soundTimer; }
 
 private:
 	void ResetHardware();
@@ -101,7 +102,7 @@ private:
 #pragma endregion
 
 private:
-	
+
 #pragma region Static Variables
 	static constexpr unsigned int START_ADDRESS = 0x200;
 
@@ -142,7 +143,7 @@ private:
 	uint8_t memory[MEMORY_SIZE] = {};
 	uint16_t index;
 	uint16_t pc;
-	uint16_t stack[STACK_LEVELS] {};
+	uint16_t stack[STACK_LEVELS] = {};
 	uint8_t sp;
 	uint8_t delayTimer;
 	uint8_t soundTimer;

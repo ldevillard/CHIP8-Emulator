@@ -12,12 +12,12 @@
 const std::string Window::INVALID_ROM = "Invalid ROM";
 
 Window::Window(const std::string& title, int width, int height, int textureWidth, int textureHeight)
-	: window(nullptr), glContext(nullptr), texture(0)
+    : window(nullptr), glContext(nullptr), texture(0)
 {
-	this->textureWidth = textureWidth;
-	this->textureHeight = textureHeight;
+    this->textureWidth = textureWidth;
+    this->textureHeight = textureHeight;
 
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     // Setup OpenGL context attributes
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -33,7 +33,7 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     SDL_GL_SetSwapInterval(1); // vsync
 
     // Load OpenGL functions with glad
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) 
+    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
     {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         exit(1);
@@ -46,13 +46,13 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     // Setup ImGui style
-	ImGui_Utils::SetPurpleTheme();
+    ImGui_Utils::SetPurpleTheme();
 
     // Init SDL + OpenGL3 backends
     ImGui_ImplSDL3_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init("#version 460");
 
-	// Setup render texture 
+    // Setup render texture 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -63,29 +63,50 @@ Window::Window(const std::string& title, int width, int height, int textureWidth
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	// TODO: Maybe move this to a separate method
-	// Check if the ROMs folder exists and is a directory
-	if (!std::filesystem::exists(ROMSFolder) || !std::filesystem::is_directory(ROMSFolder))
-	{
-		std::cerr << "ROMs folder does not exist: " << ROMSFolder << std::endl;
+    // TODO: Maybe move this to a separate method
+    // Check if the ROMs folder exists and is a directory
+    if (!std::filesystem::exists(ROMSFolder) || !std::filesystem::is_directory(ROMSFolder))
+    {
+        std::cerr << "ROMs folder does not exist: " << ROMSFolder << std::endl;
         exit(1);
-	}
+    }
 
-	// Populate the ROMS vector with .ch8 files
-	for (const auto& entry : std::filesystem::directory_iterator(ROMSFolder))
-	{
-		if (entry.is_regular_file() && entry.path().extension() == ".ch8")
-		{
-			ROMS.push_back(entry.path().string().c_str());
-		}
-	}
+    // Populate the ROMS vector with .ch8 files
+    for (const auto& entry : std::filesystem::directory_iterator(ROMSFolder))
+    {
+        if (entry.is_regular_file() && entry.path().extension() == ".ch8")
+        {
+            ROMS.push_back(entry.path().string().c_str());
+        }
+    }
 
-	// If no ROMs were found, print a message
-	if (ROMS.empty())
-	{
-		std::cerr << "No ROMs found in " << ROMSFolder << std::endl;
+    // If no ROMs were found, print a message
+    if (ROMS.empty())
+    {
+        std::cerr << "No ROMs found in " << ROMSFolder << std::endl;
         exit(1);
-	}
+    }
+
+    InitAudio();
+}
+
+void Window::InitAudio()
+{
+    audioGen = std::mt19937(std::random_device{}());
+    audioFloatDist = std::uniform_real_distribution<float>(0.95f, 1.05f);
+
+    SDL_AudioSpec audioSpec = {};
+    audioSpec.freq = SAMPLE_RATE;
+    audioSpec.format = SDL_AUDIO_F32;
+    audioSpec.channels = 1; // Mono
+
+    if (!(audioStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audioSpec, nullptr, nullptr)))
+    {
+        std::cerr << "Audio error: " << SDL_GetError() << std::endl;
+        exit(1);
+    }
+
+    SDL_ResumeAudioStreamDevice(audioStream);
 }
 
 Window::~Window()
@@ -95,7 +116,8 @@ Window::~Window()
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 
-	// Cleanup SDL/OpenGL
+    // Cleanup SDL/OpenGL
+    SDL_DestroyAudioStream(audioStream);
     SDL_GL_DestroyContext(glContext);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -132,10 +154,10 @@ void Window::Update(const void* buffer)
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
 
-	// Display the texture inside ImGui window
+    // Display the texture inside ImGui window
     {
         ImGui::Begin("CHIP8-Emulator", nullptr, ImGuiWindowFlags_NoResize);
-        
+
         ImVec2 available_size = ImGui::GetContentRegionAvail();
         ImGui::Image((ImTextureID)(intptr_t)texture, available_size, ImVec2(0, 0), ImVec2(1, 1));
 
@@ -144,10 +166,10 @@ void Window::Update(const void* buffer)
 
     // Footer
     {
-		ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize);
+        ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize);
         ImGui::SetWindowFontScale(2.0f);
-		ImGui::Text("Press ESC to exit");
-		ImGui::End();
+        ImGui::Text("Press ESC to exit");
+        ImGui::End();
     }
 
     // Debug Menu
@@ -155,8 +177,8 @@ void Window::Update(const void* buffer)
         ImGui::Begin("Debug Menu", nullptr, ImGuiWindowFlags_NoResize);
 
         ImGui::SetWindowFontScale(2.0f);
-		ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 5, 150);
-		ImGui::NewLine();
+        ImGui_Utils::DrawIntControl("Cycles", config.emulationCycles, 5, 150);
+        ImGui::NewLine();
 
         std::vector<const char*> cROMS;
         cROMS.reserve(ROMS.size());
@@ -178,7 +200,7 @@ bool Window::ProcessInput(uint8_t* keys)
 {
     bool running = true;
 
-	SDL_Event event;
+    SDL_Event event;
     while (SDL_PollEvent(&event))
     {
         // Send and handle CHIP-8 input events
@@ -204,17 +226,40 @@ bool Window::ProcessInput(uint8_t* keys)
         ImGui_ImplSDL3_ProcessEvent(&event);
     }
 
-	return running;
+    return running;
+}
+
+void Window::PlaySound()
+{
+    std::vector<float> beepSamples(SAMPLE_COUNT);
+
+    // Add random pitch factor to the frequency
+    float pitchFactor = audioFloatDist(audioGen);
+    float pitchFrequency = FREQUENCY * pitchFactor;
+
+    for (int i = 0; i < SAMPLE_COUNT; ++i)
+    {
+        float t = static_cast<float>(i) / SAMPLE_RATE;
+
+        // Generate a square wave
+        float wave = fmod(pitchFrequency * t, 1.0f) < 0.5f ? 0.25f : -0.25f;
+        beepSamples.push_back(wave);
+    }
+
+    if (!SDL_GetAudioStreamAvailable(audioStream))
+    {
+        SDL_PutAudioStreamData(audioStream, beepSamples.data(), beepSamples.size() * sizeof(float));
+    }
 }
 
 const std::string& Window::GetFirstFoundROM() const
 {
-    if (ROMS.empty()) 
+    if (ROMS.empty())
     {
         return INVALID_ROM;
-	}
-	else
-	{
-		return ROMS.front();
+    }
+    else
+    {
+        return ROMS.front();
     }
 }

@@ -6,17 +6,17 @@
 #include <vector>
 
 Chip8::Chip8()
-	: opcode(0), index(0), pc(START_ADDRESS), sp(0), delayTimer(0), soundTimer(0), 
-        randGen(std::chrono::system_clock::now().time_since_epoch().count())
+	: opcode(0), index(0), pc(START_ADDRESS), sp(0), delayTimer(0), soundTimer(0),
+	randGen(std::chrono::system_clock::now().time_since_epoch().count())
 {
-    // Load fonts into memory
-    for (unsigned int i = 0; i < FONTSET_SIZE; ++i)
-    {
-        memory[FONTSET_START_ADDRESS + i] = fontset[i];
-    }
+	// Load fonts into memory
+	for (unsigned int i = 0; i < FONTSET_SIZE; ++i)
+	{
+		memory[FONTSET_START_ADDRESS + i] = fontset[i];
+	}
 
-    // Initialize RNG
-    randByte = std::uniform_int_distribution<int>(0U, 255U);
+	// Initialize RNG
+	randByte = std::uniform_int_distribution<int>(0U, 255U);
 
 	// Initialize opcode table
 	table[0x0] = &Chip8::Table0;
@@ -28,19 +28,19 @@ Chip8::Chip8()
 	table[0x6] = &Chip8::OP_6xnn;
 	table[0x7] = &Chip8::OP_7xnn;
 	// 0x8xy0 to 0x8xyE
-	table[0x8] = &Chip8::Table8; 
+	table[0x8] = &Chip8::Table8;
 	table[0x9] = &Chip8::OP_9xy0;
 	table[0xA] = &Chip8::OP_Annn;
 	table[0xB] = &Chip8::OP_Bnnn;
 	table[0xC] = &Chip8::OP_Cxnn;
 	table[0xD] = &Chip8::OP_Dxyn;
 	// 0Ex9E and 0ExA1
-	table[0xE] = &Chip8::TableE; 
+	table[0xE] = &Chip8::TableE;
 	// 0Fx07 to 0Fx65
-	table[0xF] = &Chip8::TableF; 
+	table[0xF] = &Chip8::TableF;
 
 	// Initialize Table0, Table8, TableE with OP_NULL
-	for (int i = 0; i <= 0xE; ++i) 
+	for (int i = 0; i <= 0xE; ++i)
 	{
 		table0[i] = &Chip8::OP_NULL;
 		table8[i] = &Chip8::OP_NULL;
@@ -87,40 +87,40 @@ bool Chip8::LoadROM(const std::string& filename)
 {
 	ResetHardware();
 
-    std::ifstream file(filename, std::ios::binary | std::ios::ate);
-    if (file)
-    {
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
+	std::ifstream file(filename, std::ios::binary | std::ios::ate);
+	if (file)
+	{
+		std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
 
-        std::vector<char> buffer(size);
-        if (file.read(buffer.data(), size))
-        {
+		std::vector<char> buffer(size);
+		if (file.read(buffer.data(), size))
+		{
 			// Load the ROM into memory starting at address 0x200
-            for (std::streamsize i = 0; i < size; ++i)
-            {
-                // Prevent overflow
-				if (START_ADDRESS + i >= MEMORY_SIZE) 
-                {
+			for (std::streamsize i = 0; i < size; ++i)
+			{
+				// Prevent overflow
+				if (START_ADDRESS + i >= MEMORY_SIZE)
+				{
 					std::cerr << "ROM size exceeds memory limit." << std::endl;
-                    return false;
+					return false;
 				}
-                memory[START_ADDRESS + i] = static_cast<uint8_t>(buffer[i]);
-            }
-        }
-        else
-        {
+				memory[START_ADDRESS + i] = static_cast<uint8_t>(buffer[i]);
+			}
+		}
+		else
+		{
 			std::cerr << "Failed to read ROM data from file: " << filename << std::endl;
-            return false;
-        }
-    }
-    else 
-    {
-        // Failed to open the file
+			return false;
+		}
+	}
+	else
+	{
+		// Failed to open the file
 		std::cerr << "Failed to load ROM: " << filename << std::endl;
-        return false; 
-    }
-    
+		return false;
+	}
+
 	return true;
 }
 
@@ -140,8 +140,7 @@ void Chip8::Cycle()
 	{
 		--delayTimer;
 	}
-	
-	// TODO: Check if the sound is working
+
 	// Update sound timer
 	if (soundTimer)
 	{
@@ -216,7 +215,7 @@ void Chip8::OP_00E0()
 
 void Chip8::OP_00EE()
 {
-    --sp;
+	--sp;
 	pc = stack[sp];
 }
 
@@ -239,8 +238,8 @@ void Chip8::OP_3xnn()
 
 	if (registers[Vx] == nn)
 	{
-        // Skip next instruction
-		pc += 2; 
+		// Skip next instruction
+		pc += 2;
 	}
 }
 
@@ -322,10 +321,10 @@ void Chip8::OP_8xy4()
 	uint8_t Vy = (opcode & 0x00F0) >> 4;
 
 	uint16_t sum = registers[Vx] + registers[Vy];
-	
+
 	// Store the result in Vx
 	registers[Vx] = sum & 0xFF;
-	
+
 	// Set carry flag
 	registers[0xF] = (sum > 0xFF) ? 1 : 0;
 }
@@ -337,7 +336,7 @@ void Chip8::OP_8xy5()
 
 	// Set carry flag
 	registers[0xF] = (registers[Vx] > registers[Vy]) ? 1 : 0;
-	
+
 	// Subtract Vy from Vx
 	registers[Vx] -= registers[Vy];
 }
@@ -345,7 +344,7 @@ void Chip8::OP_8xy5()
 void Chip8::OP_8xy6()
 {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
-	
+
 	// Set carry flag to the least significant bit of Vx
 	registers[0xF] = registers[Vx] & 0x01;
 
@@ -494,7 +493,7 @@ void Chip8::OP_Fx0A()
 	if (!keyPressed)
 	{
 		// Repeat this instruction until a key is pressed
-		pc -= 2; 
+		pc -= 2;
 	}
 }
 
