@@ -11,12 +11,13 @@ Writing a simple CHIP8-Emulator to discover and learn the world of emulation.
 - **Emulator**: Run any rom of the CHIP8 system.👾
 - **Hot Reload**: You can change the emulated rom at runtime.🚀
 - **Editor**: A simple editor using ImGui that displays debug info and tools to manage the game.⛏️
+- **Audio**: Simple audio support.🔊
+- **Runtime Debug View**: View registers value at runtime.⏱️
 
 ## Planned Next Features 🚀
 
-- **Audio**: Check and add the audio support.
-- **Runtime Debug View**: Display the registers and the stack at runtime.
-- **Article**: Write an article about the project to learn more of it.
+- **Article**: Write an article about my project and motivations.✏️
+- **GameBoy**: Start a new project about making a gameboy emulator.🕹️
 
 ## Tech Stack ⚙️
 
